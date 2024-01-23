@@ -1,4 +1,5 @@
 import time, base64, hmac, hashlib, requests, json
+from utils import get_balances,make_orders, get_orders, cancel_order_id, get_order_book, get_order_book_recently
 
 file_path = "api_key.txt"
 
@@ -12,43 +13,28 @@ with open(file_path, 'r', encoding='utf-8') as f:
 apikey = conkey
 secret = secretkey
 
-asset_name = "BTC"
+asset_name = "VELO"
+ticker_pair = "VELO-KRW"
 
-# nonce값 생성
-nonce = str(time.time())
-method = 'GET'
-#request_path = f'/balances/{asset_name}'
-request_path = f'/orders'
-
-#필수 정보를 연결하여 prehash 문자열을 생성함
-what = nonce + method + request_path
-#base64로 secret을 디코딩함
-key = base64.b64decode(secret)
-#hmac으로 필수 메시지에 서명하고
-signature = hmac.new(key, str(what).encode('utf-8'), hashlib.sha512)
-#그 결과물을 base64로 인코딩함
-signature_b64 = base64.b64encode(signature.digest())
 
 # HTML 소스 가져오기
 def HTMLsouceGet(p):
-	print (p.text)
+    print (p.text)
+    return p.json()
 	
-custom_headers = {
-	'API-Key': apikey,
-	'Signature': signature_b64,
-	'Nonce': nonce
-}
-
 def main():
-	# method = get
-	req = requests.get(url = 'https://api.gopax.co.kr' + request_path, headers = custom_headers)
+    balance = get_balances(apikey, secret, asset_name)
+    print(balance.text)
+    time.sleep(1)
+    order_book = get_order_book(apikey, secret, ticker_pair)
+    print(order_book.text)
+    time.sleep(1)
+    req = make_orders(apikey, secret, ticker_pair)
+    print("req done!")
+    
 
-	if req.ok:
-		HTMLsouceGet(req)
 
-	else:
-		print ('요청 에러')
-		HTMLsouceGet(req)
+
 
 if __name__ == '__main__':
 	main()
