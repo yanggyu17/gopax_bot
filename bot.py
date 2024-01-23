@@ -17,7 +17,8 @@ asset_name = "BTC"
 # nonce값 생성
 nonce = str(time.time())
 method = 'GET'
-request_path = f'/balances/{asset_name}'
+#request_path = f'/balances/{asset_name}'
+request_path = f'/orders'
 
 #필수 정보를 연결하여 prehash 문자열을 생성함
 what = nonce + method + request_path
